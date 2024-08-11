@@ -86,7 +86,7 @@ func (p *Plugin) send_msg_to_telegram(msg string, bot_token string, chat_id stri
 
 func (p *Plugin) connect_websocket(url string, subClientIndex int) {
     for {
-        ws, _, err := websocket.DefaultDialer.Dial(p.config.GotifyHost, nil)
+        ws, _, err := websocket.DefaultDialer.Dial(url, nil)
         if err == nil {
             p.ws[subClientIndex] = ws
             break
