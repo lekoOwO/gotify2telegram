@@ -54,7 +54,7 @@ func (c *Plugin) ValidateAndSetConfig(config interface{}) error {
 			return fmt.Errorf("telegram chat id is required for client %d", i)
 		}
 	}
-
+  
 	c.config = newConfig
 	return nil
 }

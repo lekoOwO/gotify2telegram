@@ -102,7 +102,7 @@ func format_telegram_message(msg *GotifyMessage) {
     return fmt.Sprintf(
         "%s\n%s\n\nDate: %s", 
         title, 
-        template.HTMLEscapeString(msg.Message), 
+        template.HTMLEscapeString(msg.Message),
         msg.Date,
     )
 }
