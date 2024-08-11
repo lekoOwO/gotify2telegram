@@ -5,7 +5,6 @@ import (
     "encoding/json"
     "fmt"
     "net/http"
-    "os"
     "time"
     "html/template"
 
@@ -96,7 +95,7 @@ func (p *Plugin) connect_websocket(url string, subClientIndex int) {
     }
 }
 
-func format_telegram_message(msg *GotifyMessage) {
+func format_telegram_message(msg *GotifyMessage) string {
     // HTML Should be escaped here
     title := string(template.HTML("<b>" + template.HTMLEscapeString(msg.Title) + "</b>"))
     return fmt.Sprintf(
@@ -142,7 +141,7 @@ func (p *Plugin) Enable() error {
     for i, subClient := range p.config.Clients {
         go p.get_websocket_msg(
             p.config.GotifyHost, 
-            subClient, i,
+            &subClient, i,
         )
     }
     return nil
@@ -150,7 +149,7 @@ func (p *Plugin) Enable() error {
 
 // Disable implements plugin.Plugin
 func (p *Plugin) Disable() error {
-    for i, ws := range p.ws {
+    for _, ws := range p.ws {
         if ws != nil {
             ws.Close()
         }
