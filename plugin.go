@@ -102,8 +102,8 @@ func format_telegram_message(msg *GotifyMessage) {
     return fmt.Sprintf(
         "%s\n%s\n\nDate: %s", 
         title, 
-        template.HTMLEscapeString(msg.Message), 
-        msg.Date
+        template.HTMLEscapeString(msg.Message),
+        msg.Date,
     )
 }
 
@@ -127,7 +127,7 @@ func (p *Plugin) get_websocket_msg(url string, subClient *SubClient, subClientIn
             format_telegram_message(msg),
             subClient.Telegram.BotToken,
             subClient.Telegram.ChatId,
-            subClient.Telegram.ThreadId
+            subClient.Telegram.ThreadId,
         )
     }
 }
@@ -142,7 +142,7 @@ func (p *Plugin) Enable() error {
     for i, subClient := range p.config.Clients {
         go p.get_websocket_msg(
             p.config.GotifyHost, 
-            subClient, i
+            subClient, i,
         )
     }
     return nil
@@ -161,7 +161,7 @@ func (p *Plugin) Disable() error {
 // NewGotifyPluginInstance creates a plugin instance for a user context.
 func NewGotifyPluginInstance(ctx plugin.UserContext) plugin.Plugin {
     return &Plugin{
-        ws: make(map[int]*websocket.Conn)
+        ws: make(map[int]*websocket.Conn),
     }
 }
 

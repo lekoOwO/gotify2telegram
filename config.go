@@ -30,7 +30,7 @@ func (c *Plugin) DefaultConfig() interface{} {
 				Telegram: Telegram{
 					ChatId:	"-100123456789",
 					BotToken: "YourBotTokenHere",
-					ThreadId: "OptionalThreadIdHere"
+					ThreadId: "OptionalThreadIdHere",
 				},
 			},
 		},
@@ -54,7 +54,7 @@ func (c *Plugin) ValidateAndSetConfig(config interface{}) error {
 			return fmt.Errorf("telegram chat id is required for client %d", i)
 		}
 	}
-	
+  
 	c.config = newConfig
 	return nil
 }
