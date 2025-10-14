@@ -10,16 +10,28 @@ type Telegram struct {
 	ThreadId string	 `yaml:"thread_id"`
 }
 
+type DiscordDefaults struct {
+	Username  string `yaml:"username"`
+	AvatarURL string `yaml:"avatar_url"`
+}
+
+type Discord struct {
+	WebhookURL string `yaml:"webhook_url"`
+	DiscordDefaults
+}
+
 type SubClient struct {
 	AppId		int		 `yaml:"app_id"`
 	Telegram	Telegram `yaml:"telegram"`
+	Discord	    Discord  `yaml:"discord"`
 }
 
 // Config is user plugin configuration
 type Config struct {
-	Clients	   			[]SubClient	`yaml:"clients"`
-	GotifyHost 			string		`yaml:"gotify_host"`
-	GotifyClientToken	string	 	`yaml:"token"`
+	Clients	   			[]SubClient	    `yaml:"clients"`
+	GotifyHost 			string		    `yaml:"gotify_host"`
+	GotifyClientToken	string	 	    `yaml:"token"`
+	DiscordDefaults		DiscordDefaults `yaml:"discord"`
 }
 
 // DefaultConfig implements plugin.Configurer
@@ -33,7 +45,18 @@ func (c *Plugin) DefaultConfig() interface{} {
 					BotToken: "YourBotTokenHere",
 					ThreadId: "OptionalThreadIdHere",
 				},
+				Discord: Discord{
+					WebhookURL: "",
+					DiscordDefaults: DiscordDefaults{
+						Username:  "DefaultUsername",
+						AvatarURL: "DefaultAvatarURL",
+					},
+				},
 			},
+		},
+		DiscordDefaults: DiscordDefaults{
+			Username:  "DefaultUsername",
+			AvatarURL: "DefaultAvatarURL",
 		},
 		GotifyHost: "ws://localhost:80",
 		GotifyClientToken: "ExampleToken",
@@ -51,11 +74,22 @@ func (c *Plugin) ValidateAndSetConfig(config interface{}) error {
 		if client.AppId == 0 {
 			return fmt.Errorf("gotify app id is required for client %d", i)
 		}
-		if client.Telegram.BotToken == "" {
-			return fmt.Errorf("telegram bot token is required for client %d", i)
+		// Require at least one destination: Telegram or Discord
+		if client.Telegram.BotToken == "" && client.Discord.WebhookURL == "" {
+			return fmt.Errorf("either telegram or discord must be configured for client %d", i)
 		}
-		if client.Telegram.ChatId == "" {
-			return fmt.Errorf("telegram chat id is required for client %d", i)
+
+		if client.Telegram.BotToken != "" {
+			if client.Telegram.ChatId == "" {
+				return fmt.Errorf("telegram chat id is required for client %d", i)
+			}
+		}
+
+		if client.Discord.WebhookURL != "" {
+			// very basic validation
+			if len(client.Discord.WebhookURL) < 8 {
+				return fmt.Errorf("discord webhook url seems invalid for client %d", i)
+			}
 		}
 	}
   

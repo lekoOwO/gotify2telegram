@@ -15,8 +15,8 @@ func GetGotifyPluginInfo() plugin.Info {
 		Version:     "1.1",
 		Author:      "Anh Bui & Leko",
 		Name:        "Gotify 2 Telegram",
-		Description: "Telegram message fowarder for gotify",
-		ModulePath:  "https://github.com/anhbh310/gotify2telegram",
+		Description: "Forward Gotify messages to Telegram and Discord",
+		ModulePath:  "https://github.com/lekoOwO/gotify2telegram",
 	}
 }
 
@@ -91,12 +91,30 @@ func (p *Plugin) get_websocket_msg(url string) {
 		for _, subClient := range p.config.Clients {
 			if subClient.AppId == int(msg.Appid) || subClient.AppId == -1 {
 				debug("get_websocket_msg: AppId Matched! Sending to telegram...")
-				send_msg_to_telegram(
-					format_telegram_message(msg),
-					subClient.Telegram.BotToken,
-					subClient.Telegram.ChatId,
-					subClient.Telegram.ThreadId,
-				)
+				// Send to Telegram if configured
+				if subClient.Telegram.BotToken != "" {
+					send_msg_to_telegram(
+						format_telegram_message(msg),
+						subClient.Telegram.BotToken,
+						subClient.Telegram.ChatId,
+						subClient.Telegram.ThreadId,
+					)
+				}
+
+				// Send to Discord if configured
+				if subClient.Discord.WebhookURL != "" {
+					username := subClient.Discord.Username
+					avatar := subClient.Discord.AvatarURL
+					// fallback to global defaults if empty
+					if username == "" && p.config != nil {
+						username = p.config.DiscordDefaults.Username
+					}
+					if avatar == "" && p.config != nil {
+						avatar = p.config.DiscordDefaults.AvatarURL
+					}
+					embeds := format_discord_embeds(msg)
+					send_msg_to_discord(embeds, subClient.Discord.WebhookURL, username, avatar)
+				}
 				break
 			}
 		}

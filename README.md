@@ -1,5 +1,5 @@
-# Gotify 2 Telegram
-This Gotify plugin forwards all received messages to Telegram through the Telegram bot.
+# Gotify 2 Telegram (and Discord)
+This Gotify plugin forwards received messages to Telegram and/or Discord.
 
 ## Prerequisite
 - A Telegram bot, bot token, and chat ID from bot conversation. You can get that information by following this [blog](https://medium.com/linux-shots/setup-telegram-bot-to-get-alert-notifications-90be7da4444).
@@ -8,7 +8,7 @@ This Gotify plugin forwards all received messages to Telegram through the Telegr
 ## Installation
 * **By shared object**
 
-    1. Get the compatible shared object from [release](https://github.com/anhbh310/gotify2telegram/releases).
+    1. Get the compatible shared object from [release](https://github.com/lekoOwO/gotify2telegram/releases).
 
     2. Put it into Gotify plugin folder.
 
@@ -32,7 +32,9 @@ This Gotify plugin forwards all received messages to Telegram through the Telegr
 
 ## Configuration
 
-The configuration contains three keys: `clients`, `gotify_host` and `token`.
+The configuration contains four keys: `clients`, `gotify_host`, `token` and `discord`.
+
+This plugin supports sending to Telegram, Discord, or both. Each `SubClient` may independently enable Telegram and/or Discord.
 
 ### Clients
 
@@ -45,11 +47,25 @@ clients:
       chat_id: "ID of the telegram chat"
       token: "The bot token"
       thread_id: "Thread ID of the telegram topic. Leave it empty if we are not sending to a topic."
+    discord:
+      webhook_url: "https://discord.com/api/webhooks/..."
+      username: "Optional per-client username (falls back to global discord defaults if empty)"
+      avatar_url: "Optional per-client avatar URL (falls back to global defaults if empty)"
   - app_id: "Maybe the second Gotify Client Token, yay!"
     telegram:
       chat_id: "ID of the telegram chat"
       token: "The bot token"
       thread_id: "Thread ID of the telegram topic. Leave it empty if we are not sending to a topic."
+```
+
+### Global Discord defaults
+
+You can set global Discord defaults (used when per-client username/avatar are empty):
+
+```yaml
+discord:
+  username: "GotifyBot"
+  avatar_url: "https://example.com/avatar.png"
 ```
 
 ### Gotify Host
