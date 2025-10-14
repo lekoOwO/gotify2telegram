@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        gotify-version: ["2.5.0", "2.6.1"]
+        gotify-version: ["2.5.0", "2.6.1", "2.7.3"]
 
     steps:
       - name: Checkout source code
