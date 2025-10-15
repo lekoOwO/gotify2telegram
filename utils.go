@@ -96,8 +96,8 @@ type DiscordEmbedFooter struct {
 // format_discord_embeds builds one or more embeds from GotifyMessage.
 // It will split long descriptions into multiple embeds if necessary.
 func format_discord_embeds(msg *GotifyMessage) []DiscordEmbed {
-	title := template.HTMLEscapeString(msg.Title)
-	body := template.HTMLEscapeString(msg.Message)
+	title := msg.Title
+	body := msg.Message
 
 	// decide color by priority (example mapping)
 	color := 0x2ECC71 // green default
