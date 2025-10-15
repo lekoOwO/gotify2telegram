@@ -126,9 +126,9 @@ func format_discord_embeds(msg *GotifyMessage) []DiscordEmbed {
 			Title:       title,
 			Description: desc,
 			Color:       color,
-			Timestamp:   time.Now().UTC().Format(time.RFC3339),
+			Timestamp:   msg.Date,
 			Footer: &DiscordEmbedFooter{
-				Text: fmt.Sprintf("Gotify Id: %d | Date: %s", msg.Id, msg.Date),
+				Text: fmt.Sprintf("Gotify Id: %d", msg.Id),
 			},
 		}
 		// For subsequent chunks, omit the title to avoid repetition
