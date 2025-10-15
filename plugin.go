@@ -12,9 +12,9 @@ import (
 // GetGotifyPluginInfo returns gotify plugin info
 func GetGotifyPluginInfo() plugin.Info {
 	return plugin.Info{
-		Version:     "1.1",
-		Author:      "Anh Bui & Leko",
-		Name:        "Gotify 2 Telegram",
+		Version:     "2.0",
+		Author:      "Leko",
+		Name:        "SNS Forwarder",
 		Description: "Forward Gotify messages to Telegram and Discord",
 		ModulePath:  "https://github.com/lekoOwO/gotify2telegram",
 	}
