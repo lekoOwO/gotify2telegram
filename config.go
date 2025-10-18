@@ -5,9 +5,9 @@ import (
 )
 
 type Telegram struct {
-	ChatId	 string	 `yaml:"chat_id"`
-	BotToken string	 `yaml:"token"`
-	ThreadId string	 `yaml:"thread_id"`
+	ChatId   string `yaml:"chat_id"`
+	BotToken string `yaml:"token"`
+	ThreadId string `yaml:"thread_id"`
 }
 
 type DiscordDefaults struct {
@@ -21,17 +21,17 @@ type Discord struct {
 }
 
 type SubClient struct {
-	AppId		int		 `yaml:"app_id"`
-	Telegram	Telegram `yaml:"telegram"`
-	Discord	    Discord  `yaml:"discord"`
+	AppId    int      `yaml:"app_id"`
+	Telegram Telegram `yaml:"telegram"`
+	Discord  Discord  `yaml:"discord"`
 }
 
 // Config is user plugin configuration
 type Config struct {
-	Clients	   			[]SubClient	    `yaml:"clients"`
-	GotifyHost 			string		    `yaml:"gotify_host"`
-	GotifyClientToken	string	 	    `yaml:"token"`
-	DiscordDefaults		DiscordDefaults `yaml:"discord"`
+	Clients           []SubClient     `yaml:"clients"`
+	GotifyHost        string          `yaml:"gotify_host"`
+	GotifyClientToken string          `yaml:"token"`
+	DiscordDefaults   DiscordDefaults `yaml:"discord"`
 }
 
 // DefaultConfig implements plugin.Configurer
@@ -41,7 +41,7 @@ func (c *Plugin) DefaultConfig() interface{} {
 			SubClient{
 				AppId: 0,
 				Telegram: Telegram{
-					ChatId:	"-100123456789",
+					ChatId:   "-100123456789",
 					BotToken: "YourBotTokenHere",
 					ThreadId: "OptionalThreadIdHere",
 				},
@@ -58,7 +58,7 @@ func (c *Plugin) DefaultConfig() interface{} {
 			Username:  "DefaultUsername",
 			AvatarURL: "DefaultAvatarURL",
 		},
-		GotifyHost: "ws://localhost:80",
+		GotifyHost:        "ws://localhost:80",
 		GotifyClientToken: "ExampleToken",
 	}
 }
@@ -92,7 +92,7 @@ func (c *Plugin) ValidateAndSetConfig(config interface{}) error {
 			}
 		}
 	}
-  
+
 	c.config = newConfig
 	return nil
 }
