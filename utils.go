@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"io"
 )
 
 func debug(s string, x ...interface{}) {
@@ -167,20 +168,19 @@ func send_msg_to_discord(embeds []DiscordEmbed, webhookURL string, username stri
 			log.Println("Create discord json false")
 			return
 		}
-		body := bytes.NewReader(payloadBytes)
-
-		req, err := http.NewRequest("POST", webhookURL, body)
-		if err != nil {
-			log.Println("Create discord request false")
-			return
-		}
-		req.Header.Set("Content-Type", "application/json")
 
 		// Retry loop with exponential backoff and special handling for 429
 		var resp *http.Response
 		var attempt int
 		maxRetries := 5
 		for attempt = 0; attempt <= maxRetries; attempt++ {
+			req, err := http.NewRequest("POST", webhookURL, bytes.NewReader(payloadBytes))
+			if err != nil {
+				log.Println("Create discord request false")
+				return
+			}
+			req.Header.Set("Content-Type", "application/json")
+
 			resp, err = client.Do(req)
 			if err != nil {
 				// network error, retry
@@ -192,7 +192,10 @@ func send_msg_to_discord(embeds []DiscordEmbed, webhookURL string, username stri
 			// handle 429 (rate limit)
 			if resp.StatusCode == 429 {
 				ra := resp.Header.Get("Retry-After")
+				// read and log a small part of body for debugging
+				b, _ := io.ReadAll(io.LimitReader(resp.Body, 1024))
 				resp.Body.Close()
+				log.Printf("discord: rate limited (429). Retry-After=%s; body=%s", ra, strings.TrimSpace(string(b)))
 				var wait time.Duration
 				if ra != "" {
 					// try seconds first
@@ -215,24 +218,33 @@ func send_msg_to_discord(embeds []DiscordEmbed, webhookURL string, username stri
 
 			// retry on 5xx server errors
 			if resp.StatusCode >= 500 && resp.StatusCode < 600 {
+				// read part of body for debug
+				b, _ := io.ReadAll(io.LimitReader(resp.Body, 1024))
 				resp.Body.Close()
+				log.Printf("discord: server error %d, body=%s", resp.StatusCode, strings.TrimSpace(string(b)))
 				backoff := time.Duration(1<<attempt) * 500 * time.Millisecond
 				time.Sleep(backoff)
 				continue
 			}
 
-			// other status codes (2xx or 4xx) - do not retry
-			resp.Body.Close()
+			// other status codes (2xx success or 4xx client error) - do not retry
+			if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+				b, _ := io.ReadAll(io.LimitReader(resp.Body, 2048))
+				resp.Body.Close()
+				log.Printf("discord: unexpected status %d. body=%s", resp.StatusCode, strings.TrimSpace(string(b)))
+			} else {
+				resp.Body.Close()
+			}
 			break
 		}
 
 		if err != nil {
-			fmt.Printf("Send discord request false: %v\n", err)
+			log.Printf("discord: request failed: %v", err)
 			return
 		}
 		// if we exhausted retries, log and continue to next batch
 		if attempt > maxRetries {
-			fmt.Printf("Send discord request failed after %d attempts\n", maxRetries)
+			log.Printf("discord: send failed after %d attempts", maxRetries)
 		}
 	}
 }
