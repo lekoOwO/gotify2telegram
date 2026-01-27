@@ -1,4 +1,4 @@
-module github.com/gotify/plugin-template
+module github.com/lekoOwO/gotify2telegram
 
 go 1.18
 
